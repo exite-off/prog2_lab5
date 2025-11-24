@@ -22,17 +22,17 @@ void work() {
     auto start = std::chrono::steady_clock::now();
 
     std::promise<void> p_a1, p_a4;
-    std::shared_future<void> f_a1 = p_a1.get_future();
-    std::shared_future<void> f_a4 = p_a4.get_future();
+    std::future<void> f_a1 = p_a1.get_future();
+    std::future<void> f_a4 = p_a4.get_future();
 
-    auto branch1 = std::async(std::launch::async, [f_a1]() {
+    auto branch1 = std::async(std::launch::async, [f_a1 = std::move(f_a1)]() {
         slow("A2");
         f_a1.wait();
         quick("B");
         quick("D");
     });
 
-    auto branch2 = std::async(std::launch::async, [f_a4]() {
+    auto branch2 = std::async(std::launch::async, [f_a4 = std::move(f_a4)]() {
         slow("A3");
         f_a4.wait();
         quick("C");
